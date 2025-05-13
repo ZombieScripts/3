@@ -1,0 +1,123 @@
+--// Zombies UI Library
+local TweenService = game:GetService("TweenService")
+local ZombiesUI = {}
+local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
+
+--// Create Window
+function ZombiesUI:CreateWindow(title, size, position)
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Parent = game.CoreGui
+
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Size = size or UDim2.new(0, 350, 0, 280)
+    mainFrame.Position = position or UDim2.new(0.5, -175, 0.5, -140)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    mainFrame.BackgroundTransparency = 1
+    mainFrame.BorderSizePixel = 0
+    mainFrame.Parent = screenGui
+    mainFrame.ClipsDescendants = true
+    mainFrame.Active = true
+    mainFrame.Draggable = true
+
+    local uiCorner = Instance.new("UICorner")
+    uiCorner.CornerRadius = UDim.new(0, 12)
+    uiCorner.Parent = mainFrame
+
+    local titleBar = Instance.new("Frame")
+    titleBar.Size = UDim2.new(1, 0, 0, 35)
+    titleBar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    titleBar.BorderSizePixel = 0
+    titleBar.Parent = mainFrame
+
+    local titleText = Instance.new("TextLabel")
+    titleText.Size = UDim2.new(1, -60, 1, 0)
+    titleText.BackgroundTransparency = 1
+    titleText.Text = title
+    titleText.Font = Enum.Font.GothamBold
+    titleText.TextSize = 15
+    titleText.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleText.TextXAlignment = Enum.TextXAlignment.Left
+    titleText.Position = UDim2.new(0, 10, 0, 0)
+    titleText.Parent = titleBar
+
+    local minimizeButton = Instance.new("TextButton")
+    minimizeButton.Size = UDim2.new(0, 20, 0, 20)
+    minimizeButton.Position = UDim2.new(1, -50, 0, 7)
+    minimizeButton.Text = "-"
+    minimizeButton.Font = Enum.Font.GothamBold
+    minimizeButton.TextSize = 14
+    minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    minimizeButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    minimizeButton.BorderSizePixel = 0
+    minimizeButton.Parent = titleBar
+
+    local closeButton = Instance.new("TextButton")
+    closeButton.Size = UDim2.new(0, 20, 0, 20)
+    closeButton.Position = UDim2.new(1, -25, 0, 7)
+    closeButton.Text = "X"
+    closeButton.Font = Enum.Font.GothamBold
+    closeButton.TextSize = 14
+    closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    closeButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    closeButton.BorderSizePixel = 0
+    closeButton.Parent = titleBar
+
+    --// Tween Functions
+    local function fadeIn()
+        mainFrame.Visible = true
+        local tween = TweenService:Create(mainFrame, tweenInfo, {BackgroundTransparency = 0})
+        tween:Play()
+    end
+
+    local function fadeOut()
+        local tween = TweenService:Create(mainFrame, tweenInfo, {BackgroundTransparency = 1})
+        tween:Play()
+        tween.Completed:Connect(function()
+            mainFrame.Visible = false
+        end)
+    end
+
+    minimizeButton.MouseButton1Click:Connect(function()
+        if mainFrame.Size.Y.Offset > 35 then
+            TweenService:Create(mainFrame, tweenInfo, {Size = UDim2.new(0, 350, 0, 35)}):Play()
+        else
+            TweenService:Create(mainFrame, tweenInfo, {Size = size or UDim2.new(0, 350, 0, 280)}):Play()
+        end
+    end)
+
+    closeButton.MouseButton1Click:Connect(function()
+        fadeOut()
+    end)
+
+    fadeIn()
+
+    return {
+        Frame = mainFrame,
+        FadeIn = fadeIn,
+        FadeOut = fadeOut
+    }
+end
+
+--// Create Button
+function ZombiesUI:CreateButton(parent, text, position, callback, color)
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(0, 320, 0, 40)
+    button.Position = position
+    button.BackgroundColor3 = color or Color3.fromRGB(50, 50, 50)
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.Text = text
+    button.Font = Enum.Font.GothamBold
+    button.TextSize = 15
+    button.BorderSizePixel = 0
+    button.Parent = parent
+
+    local buttonCorner = Instance.new("UICorner")
+    buttonCorner.CornerRadius = UDim.new(0, 8)
+    buttonCorner.Parent = button
+
+    button.MouseButton1Click:Connect(function()
+        callback()
+    end)
+end
+
+return ZombiesUI
